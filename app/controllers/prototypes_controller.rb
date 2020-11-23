@@ -7,19 +7,16 @@ class PrototypesController < ApplicationController
   end
 
   def new
-    if user_signed_in?
-      @prototype = Prototype.new
-    else
-      render 
-    end
+    @prototype = Prototype.new
   end
 
   def create
-    prototype = Prototype.create(prototype_params)
-    if prototype.save
+    @prototype = Prototype.new(prototype_params)
+    if @prototype.valid?
+      @post.save
       redirect_to root_path
     else
-      render :new
+      render 'new'
     end
   end
 
@@ -33,12 +30,12 @@ class PrototypesController < ApplicationController
   end
 
   def update
-    prototype = Prototype.find(params[:id])
-    prototype.update(prototype_params)
-    if prototype.save
-      redirect_to prototype_path
+    @prototype = Prototype.find(params[:id])
+    @prototype.update(prototype_params)
+    if @prototype.valid?
+      redirect_to prototype_path(@prototype.id)
     else
-      render :edit
+      render 'edit'
     end
   end
 
@@ -50,7 +47,7 @@ class PrototypesController < ApplicationController
 
   private
   def prototype_params
-    params.require(:prototype).permit(:title, :catch_copy, :concept,:image).merge(user_id: current_user.id)
+    params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
   end
 
   def move_to_index
